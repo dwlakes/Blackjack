@@ -6,6 +6,12 @@ Just a Blackjack game. Has bossanova in the background. You can make bets, then 
 
 https://user-images.githubusercontent.com/76272809/151851968-4d569d32-593a-4f9a-9b9b-fb43c4d25789.mov
 
+
+
+https://user-images.githubusercontent.com/76272809/152550428-54e5cb7f-36ff-4a9e-beb0-8c6eba93558e.mov
+
+
+
 <img width="1280" alt="Captura de Pantalla 2022-01-31 a la(s) 12 32 33 p  m" src="https://user-images.githubusercontent.com/76272809/151852345-d12424d2-d9e5-4ccd-b412-ee0c747ae35f.png">
 <img width="1280" alt="Captura de Pantalla 2022-01-31 a la(s) 12 32 58 p  m" src="https://user-images.githubusercontent.com/76272809/151852361-388de71f-b712-44c9-8c08-2aaa6403da5c.png">
 <img width="1280" alt="Captura de Pantalla 2022-01-31 a la(s) 12 33 21 p  m" src="https://user-images.githubusercontent.com/76272809/151852373-715e5cae-727f-46f4-a9ec-46a323a20b76.png">
