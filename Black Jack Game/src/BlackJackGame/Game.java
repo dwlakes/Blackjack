@@ -49,6 +49,7 @@ public class Game extends Application{
 	Button btHit = new Button("Hit");
 	Button btRetry = new Button("Next Round");
 	Button btStand = new Button("Stand");
+	Button btnDouble = new Button("Double Down");
 	int resetCounter=0;
 	int bank = 1000;
 	Label bankLabel = new Label("");
@@ -542,7 +543,6 @@ public class Game extends Application{
 	    btHit.setLayoutX(10);
 	    btHit.setLayoutY(450);
 	    
-	    
 	    btRetry.setVisible(false);
 	    btRetry.setLayoutX(100);
 	    btRetry.setLayoutY(450);
@@ -550,6 +550,11 @@ public class Game extends Application{
 	    btStand.setVisible(false);
 	    btStand.setLayoutX(190);
 	    btStand.setLayoutY(450);
+	    
+	    btnDouble.setVisible(false);
+	    btnDouble.setLayoutX(250);
+	    btnDouble.setLayoutY(450);
+	   
 	    
 	    
 	    gameOverLabel.setVisible(false);
@@ -599,8 +604,6 @@ public class Game extends Application{
 	    bankLabel2.setTextFill(Color.BEIGE);
 	    
 	    
-	    
-	   
 	   
 	   //Sets up background image
 	   
@@ -611,7 +614,7 @@ public class Game extends Application{
 		
 	    Group root = new Group (imageView, imageView2,imageView3,imageView4,btHit,btRetry,userCardHit1Label,
 	    		userCardHit2Label,userCardHit3Label,userCardHit4Label,btStand,dealerCardHit1Label,dealerCardHit2Label,
-	    		dealerCardHit3Label,dealerCardHit4Label,resultsLabel, currentBetLabel,bankLabel2,gameOverLabel);
+	    		dealerCardHit3Label,dealerCardHit4Label,resultsLabel, currentBetLabel,bankLabel2,gameOverLabel,btnDouble);
 	     //root.getChildren().add(cardHit1Label);
 	    Scene scene1 = new Scene(root, 535,500);
 	    bankLabel.setText("Bank: $"+bank);
@@ -643,19 +646,19 @@ public class Game extends Application{
 	    		(userHand.handArray.get(1).type==("Ace")&&userHand.handArray.get(0).value==10)) {
 	    	if((dealerHand.handArray.get(0).type==("Ace")&&dealerHand.handArray.get(1).value==10)||
 		    		(dealerHand.handArray.get(1).type==("Ace")&&dealerHand.handArray.get(0).value==10)) {
-	    		String firstHalf = "Dealer and user";
-	    		String secondHalf = "Black Jack! Tie!";
 	    		resultsLabel.setText("Dealer and user" +'\n' + "Black Jack. Tie!");
 				imageView4.setImage(dealerHand.handArray.get(1).image);
 				btStand.setDisable(true);
 				btHit.setDisable(true);
 				btRetry.setVisible(true);
+				btnDouble.setDisable(true);
 	    	}else {
 	    		resultsLabel.setText("User Black Jack!");
 				imageView4.setImage(dealerHand.handArray.get(1).image);
 				btStand.setDisable(true);
 				btHit.setDisable(true);
 				btRetry.setVisible(true);
+				btnDouble.setDisable(true);
 				//Adds user win to bank
 				userWin();
 	    	}
@@ -669,6 +672,7 @@ public class Game extends Application{
 		btHit.setDisable(true);
 		btRetry.setVisible(true);
 		btStand.setDisable(true);
+		btnDouble.setDisable(false);
 		imageView4.setImage(dealerHand.handArray.get(1).image);
 		userLose(userHand,dealerHand,primaryStage);
 	
@@ -678,7 +682,37 @@ public class Game extends Application{
 	   
 	    //methdod and hit button action to hit hand
 	    btHit.setOnAction(e -> userHit(iterator,userHand,dealerHand,imageView4)); 
+	    //User ends turn by standing
 	    btStand.setOnAction(e -> stand(iterator,userHand,dealerHand,imageView4,primaryStage));
+	    //User doubles their bet if they want, but only as their first move
+	    btnDouble.setOnAction(e ->{
+	    	int betInt = Integer.parseInt(bet);
+	    	bank=bank-betInt;
+	    	bankLabel2.setText("Bank: $"+bank);
+	    	betInt=betInt*2;
+	    	bet = String.valueOf(betInt);
+	    	currentBetLabel.setText("Current bet: $"+betInt);
+	    	userHit(iterator,userHand,dealerHand,imageView4);
+	    	if(userHand.points>21) {
+	    		imageView4.setImage(dealerHand.handArray.get(1).image);
+				resultsLabel.setText("Bust");
+				btHit.setDisable(true);
+				btRetry.setVisible(true);
+				userHand.handArray.removeAll(userHand.handArray);
+				btStand.setDisable(true);
+				btHit.setDisable(true);
+				btRetry.setVisible(true);
+				btnDouble.setDisable(true);
+				userLose(userHand,dealerHand,primaryStage);
+	    		
+	    	}else {
+	    	stand(iterator,userHand,dealerHand,imageView4,primaryStage);
+	    	btnDouble.setDisable(true);
+	    	}
+	    	
+	    });
+	    
+			
 	    
 	    //Resets game
 	    btRetry.setOnAction(e -> {
@@ -698,6 +732,7 @@ public class Game extends Application{
 				btHit.setDisable(false);
 				btStand.setDisable(false);
 				btRetry.setVisible(false);
+				btnDouble.setDisable(false);
 				userHand.points=0;
 				userHand.handArray.removeAll(userHand.handArray);
 				dealerHand.points=0;
@@ -736,6 +771,7 @@ public class Game extends Application{
 			btHit.setVisible(false);
 			btStand.setVisible(false);
 			gameOverLabel.setVisible(true);
+			btnDouble.setVisible(false);
 			gameOverLabel.setText("You went broke! Try again?");
 			//btnNewGame.setVisible(true);
 			bank = 1000;
@@ -785,6 +821,7 @@ public class Game extends Application{
 								public void run() {
 									btStand.setVisible(true);
 									btHit.setVisible(true);
+									btnDouble.setVisible(true);
 									
 								}
 					   
@@ -840,6 +877,7 @@ public class Game extends Application{
 	private void stand(ListIterator<Card> iterator, Hand userHand, Hand dealerHand,
 			ImageView imageView4, Stage primaryStage) {
 		
+		
 		//In case the user's first move was to stand, is user's hand is calculated again
 		userHand.points= 0;
 		boolean ace = false;
@@ -882,6 +920,7 @@ public class Game extends Application{
 				btStand.setDisable(true);
 				btHit.setDisable(true);
 				btRetry.setVisible(true);
+				btnDouble.setDisable(true);
 				userLose(userHand,dealerHand,primaryStage);
 			}
 		
@@ -902,7 +941,7 @@ public class Game extends Application{
 			} 
 			//Determines if the dealer needs a hit or not	
 		imageView4.setImage(dealerHand.handArray.get(1).image);
-		while (dealerHand.points<17 ||dealerHand.points<userHand.points) {
+		while (dealerHand.points<17) {
 				
 			
 			dealerHit(dealerHand,iterator, userHand,imageView4);
@@ -911,72 +950,45 @@ public class Game extends Application{
 			}
 		imageView4.setImage(dealerHand.handArray.get(1).image);
 		//This line of codes determines if the dealer wins with just their two initial cards
-		if(dealerHand.handArray.size()==2 && userHand.points<dealerHand.points) {
+		if(userHand.points<dealerHand.points && dealerHand.points<22) {
 			System.out.println("Dealer wins with two cards " +dealerHand.points);
 			resultsLabel.setText("Dealer wins");
 			btHit.setDisable(true);
 			btRetry.setVisible(true);
 			btStand.setDisable(true);
-		}else if(dealerHand.handArray.size()==2 && userHand.points>dealerHand.points) {
+			btnDouble.setDisable(true);
+		}else if(userHand.points>dealerHand.points) {
 				System.out.println("Dealer loses with two cards " +dealerHand.points);
 				resultsLabel.setText("Player wins");
 				btHit.setDisable(true);
 				btRetry.setVisible(true);
 				btStand.setDisable(true);
+				btnDouble.setDisable(true);
 				userWin();
 			
-		}else if(dealerHand.handArray.size()==2 && dealerHand.points==userHand.points) {
-			imageView4.setImage(dealerHand.handArray.get(1).image);
-			resultsLabel.setText("Tie");
-			btHit.setDisable(true);
-			btRetry.setVisible(true);
-			btStand.setDisable(true);
-			//adds user's bet back to hand
-			tie();
-			
-		}
-		imageView4.setImage(dealerHand.handArray.get(1).image);
-		if (dealerHand.points>21) {
-			imageView4.setImage(dealerHand.handArray.get(1).image);
-			resultsLabel.setText("Dealer Bust");
-			btHit.setDisable(true);
-			btRetry.setVisible(true);
-			//Adds the user win to bank
-			userWin();
-			
-			
-		}else if (dealerHand.points>userHand.points) {
-			imageView4.setImage(dealerHand.handArray.get(1).image);
-			resultsLabel.setText("Dealer wins" );
-			btHit.setDisable(true);
-			btRetry.setVisible(true);
-			btStand.setDisable(true);
-			//checks to see if the user still has money in the bank
-			userLose(userHand,dealerHand,primaryStage);
-			System.out.println("Lose 1");
-			
-		}else if(dealerHand.points<userHand.points) {
-			imageView4.setImage(dealerHand.handArray.get(1).image);
-			resultsLabel.setText("You win");
-			btHit.setDisable(true);
-			btRetry.setVisible(true);
-			btStand.setDisable(true);
-			//Adds the user win to bank
-			userWin();
-			System.out.println("Win 1");
-			
-				
 		}else if(dealerHand.points==userHand.points) {
 			imageView4.setImage(dealerHand.handArray.get(1).image);
 			resultsLabel.setText("Tie");
 			btHit.setDisable(true);
 			btRetry.setVisible(true);
 			btStand.setDisable(true);
-			ImageView dealerCardHitFront = new ImageView(dealerHand.handArray.get(2).image);
-			dealerCardHit1Label.setGraphic(dealerCardHitFront);
-			//Adds the user's bet back to the bank 
+			System.out.println("Error here?");
+			btnDouble.setDisable(true);
+			//adds user's bet back to hand
 			tie();
-			System.out.println("Tie 1");
+			
+		}else if (dealerHand.points>21) {
+			imageView4.setImage(dealerHand.handArray.get(1).image);
+			resultsLabel.setText("Dealer Bust");
+			btHit.setDisable(true);
+			btStand.setDisable(true);
+			btRetry.setVisible(true);
+			btnDouble.setDisable(true);
+			//Adds the user win to bank
+			userWin();
+			
+			
+		
 		
 			
 		}
@@ -1103,6 +1115,9 @@ int dealerCount=2;
 	@SuppressWarnings("unchecked")
 	public int userHit( ListIterator<Card> iterator, Hand userHand,Hand dealerHand, ImageView imageView4) {
 		
+		//Disables the double down feature after the user hits, per Blackjack rules
+		btnDouble.setDisable(true);
+		
 		//adds card to userhand
 		userHand.handArray.add(iterator.next());
 		//calls the hit sound effect method
@@ -1188,6 +1203,7 @@ int dealerCount=2;
 				btStand.setDisable(true);
 				btHit.setDisable(true);
 				btRetry.setVisible(true);
+				btnDouble.setDisable(true);
 				userLose(dealerHand, dealerHand, null);
 	
 			}
@@ -1247,7 +1263,7 @@ try {
 	e.printStackTrace();
 }
 
-song.loop(Clip.LOOP_CONTINUOUSLY);
+//song.loop(Clip.LOOP_CONTINUOUSLY);
 Application.launch(args);
 	
 	}
