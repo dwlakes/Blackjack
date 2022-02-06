@@ -1,10 +1,8 @@
 package BlackJackGame;
 
-import java.io.InputStream;
-
 import javafx.scene.image.Image;
 
-public class Card {
+public class Card implements Cloneable {
 	int value;
 	int otherValue;
 	String suit;
@@ -31,5 +29,11 @@ public class Card {
 		this.imageBack=imageBack;
 	}
 	
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		
+		return super.clone();
+		
+	}
 
 }

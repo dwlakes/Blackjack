@@ -44,12 +44,29 @@ public class Game extends Application{
 	Label dealerCardHit2Label = new Label("");
 	Label dealerCardHit3Label = new Label("");
 	Label dealerCardHit4Label = new Label("");
+	Label userSplit1CardHit1Label = new Label("");
+	Label userSplit1CardHit2Label = new Label("");
+	Label userSplit1CardHit3Label = new Label("");
+	Label userSplit1CardHit4Label = new Label("");
+	Label userSplit2CardHit1Label = new Label("");
+	Label userSplit2CardHit2Label = new Label("");
+	Label userSplit2CardHit3Label = new Label("");
+	Label userSplit2CardHit4Label = new Label("");
 	Label currentBetLabel = new Label("");
 	Label gameOverLabel = new Label("");
 	Button btHit = new Button("Hit");
 	Button btRetry = new Button("Next Round");
 	Button btStand = new Button("Stand");
 	Button btnDouble = new Button("Double Down");
+	Button btnDoubleSplit1 = new Button ("Double Down" + '\n'+
+											"Split 1");
+	Button btnDoubleSplit2 = new Button ("Double Down" + '\n'+
+											"Split 2");
+	Button btnSplit = new Button("Split");
+	Button btnStandSplit1 = new Button ("Stand Split 1");
+	Button btnStandSplit2 = new Button ("Stand Split 2");
+	Button btnHitSplit1 = new Button("Hit Split 1");
+	Button btnHitSplit2 = new Button("Hit Split 2");
 	int resetCounter=0;
 	int bank = 1000;
 	Label bankLabel = new Label("");
@@ -57,6 +74,13 @@ public class Game extends Application{
 	Spinner<Integer> betSpinner = new Spinner<>(25, bank, 25, 25);
 	Button btnBet = new Button("Bet");
 	String bet;
+	boolean splitBoolean = false;
+	boolean split1Bust = false;
+	boolean split2Bust = false;
+	int split1Bet;
+	int split2Bet;
+	Label split1BetLabel = new Label("");
+	Label split2BetLabel = new Label("");
 	
 	
 
@@ -476,11 +500,14 @@ public class Game extends Application{
 		//Creates arraylists for the hand of the user and dealer
 		ArrayList<Card>userHandArray= new ArrayList<Card>();
 		ArrayList<Card>dealerHandArray= new ArrayList<Card>();
+		ArrayList<Card>userHandSplit1Array= new ArrayList<Card>();
+		ArrayList<Card>userHandSplit2Array= new ArrayList<Card>();
 		
 		
 		userHandArray.add(iterator.next());
 		iterator.next();
 		dealerHandArray.add(iterator.next());
+		iterator.next();
 		userHandArray.add(iterator.next());
 		iterator.next();
 		dealerHandArray.add(iterator.next());
@@ -488,12 +515,36 @@ public class Game extends Application{
 		//Creats an object to hold the cards and points of the dealer and user
 		Hand userHand = new Hand(0, null);
 		Hand dealerHand = new Hand(0, null);
+		Hand userHandSplit1 = new Hand(0,null);
+		Hand userHandSplit2 = new Hand(0,null);
 		
-		//initaliaztes array
-		//userHand.points = 0;
+		//initaliaztes hand arrays
 		userHand.handArray=userHandArray;
 		dealerHand.handArray=dealerHandArray;
 		
+		
+		//Clones the first card card of the userHand's array
+		try {
+			Card split1Card1 = (Card)userHand.handArray.get(0).clone();
+			userHandSplit1Array.add(split1Card1);
+		} catch (CloneNotSupportedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		//Clones the second card card of the userHand's array
+		try {
+			Card split2Card1 = (Card)userHand.handArray.get(1).clone();
+			userHandSplit2Array.add(split2Card1);
+		} catch (CloneNotSupportedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
+		//adds the clones to their respective split hands (first clone goes to first split, second clone to second split)
+		userHandSplit1.handArray=userHandSplit1Array;
+		userHandSplit2.handArray=userHandSplit2Array;
+		
+		System.out.println("Dealer hand size " +dealerHand.handArray.size());
 		
 		
 		//Creates image view
@@ -502,8 +553,6 @@ public class Game extends Application{
 		ImageView imageView3 = new ImageView(dealerHand.handArray.get(0).image);
 		ImageView imageView4 = new ImageView(dealerHand.handArray.get(1).imageBack);
 		//ImageView bgImage = new ImageView(backgroundImage);
-		
-		
 		
 		
 		//Layouts for images and buttons
@@ -543,6 +592,46 @@ public class Game extends Application{
 	    btHit.setLayoutX(10);
 	    btHit.setLayoutY(450);
 	    
+	    btnSplit.setVisible(false);
+	    btnSplit.setLayoutX(50);
+	    btnSplit.setLayoutY(450);
+	    
+	    btnHitSplit1.setVisible(false);
+	    btnHitSplit1.setLayoutX(10);
+	    btnHitSplit1.setLayoutY(370);
+	    
+	    btnHitSplit2.setVisible(false);
+	    btnHitSplit2.setLayoutX(85);
+	    btnHitSplit2.setLayoutY(370);
+	    
+	    btnStandSplit1.setVisible(false);
+	    btnStandSplit1.setLayoutX(10);
+	    btnStandSplit1.setLayoutY(335);
+	    
+	    btnStandSplit2.setVisible(false);
+	    btnStandSplit2.setLayoutX(100);
+	    btnStandSplit2.setLayoutY(335);
+	    
+	    btnDoubleSplit1.setVisible(false);
+	    btnDoubleSplit1.setLayoutX(10);
+	    btnDoubleSplit1.setLayoutY(285);
+	    
+	    btnDoubleSplit2.setVisible(false);
+	    btnDoubleSplit2.setLayoutX(110);
+	    btnDoubleSplit2.setLayoutY(285);
+	    
+	    split2BetLabel.setVisible(true);
+	    split2BetLabel.setLayoutX(10);
+	    split2BetLabel.setLayoutY(265);
+	    split2BetLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, FontPosture.REGULAR, 16));
+	    split2BetLabel.setTextFill(Color.BEIGE);
+	    
+	    split1BetLabel.setVisible(true);
+	    split1BetLabel.setLayoutX(10);
+	    split1BetLabel.setLayoutY(245);
+	    split1BetLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, FontPosture.REGULAR, 16));
+	    split1BetLabel.setTextFill(Color.BEIGE);
+	   
 	    btRetry.setVisible(false);
 	    btRetry.setLayoutX(100);
 	    btRetry.setLayoutY(450);
@@ -555,7 +644,6 @@ public class Game extends Application{
 	    btnDouble.setLayoutX(250);
 	    btnDouble.setLayoutY(450);
 	   
-	    
 	    
 	    gameOverLabel.setVisible(false);
 	    gameOverLabel.setLayoutX(177);
@@ -614,7 +702,10 @@ public class Game extends Application{
 		
 	    Group root = new Group (imageView, imageView2,imageView3,imageView4,btHit,btRetry,userCardHit1Label,
 	    		userCardHit2Label,userCardHit3Label,userCardHit4Label,btStand,dealerCardHit1Label,dealerCardHit2Label,
-	    		dealerCardHit3Label,dealerCardHit4Label,resultsLabel, currentBetLabel,bankLabel2,gameOverLabel,btnDouble);
+	    		dealerCardHit3Label,dealerCardHit4Label,resultsLabel, currentBetLabel,bankLabel2,gameOverLabel,btnDouble,btnSplit,
+	    		userSplit1CardHit1Label,userSplit1CardHit2Label,userSplit1CardHit3Label,userSplit1CardHit4Label,btnHitSplit1,btnHitSplit2,
+	    		btnStandSplit1,btnStandSplit2,userSplit2CardHit1Label,userSplit2CardHit2Label,userSplit2CardHit3Label,
+	    		userSplit2CardHit4Label,btnDoubleSplit1,btnDoubleSplit2,split2BetLabel,split1BetLabel);
 	     //root.getChildren().add(cardHit1Label);
 	    Scene scene1 = new Scene(root, 535,500);
 	    bankLabel.setText("Bank: $"+bank);
@@ -632,7 +723,7 @@ public class Game extends Application{
 			currentBetLabel.setText("Current bet: $"+bet);
 			bankLabel2.setText("Bank: $"+bank);
 			//calls the method to do the initial dealing of the game
-			initialDealMethod(imageView,imageView2,imageView3,imageView4);
+			initialDealMethod(imageView,imageView2,imageView3,imageView4,userHand);
 			
 			//launches scene of main game
 			
@@ -683,7 +774,7 @@ public class Game extends Application{
 	    //methdod and hit button action to hit hand
 	    btHit.setOnAction(e -> userHit(iterator,userHand,dealerHand,imageView4)); 
 	    //User ends turn by standing
-	    btStand.setOnAction(e -> stand(iterator,userHand,dealerHand,imageView4,primaryStage));
+	    btStand.setOnAction(e -> stand(iterator,userHand,dealerHand,userHandSplit1,userHandSplit2,imageView4,primaryStage));
 	    //User doubles their bet if they want, but only as their first move
 	    btnDouble.setOnAction(e ->{
 	    	int betInt = Integer.parseInt(bet);
@@ -706,13 +797,104 @@ public class Game extends Application{
 				userLose(userHand,dealerHand,primaryStage);
 	    		
 	    	}else {
-	    	stand(iterator,userHand,dealerHand,imageView4,primaryStage);
+	    	imageView4.setImage(dealerHand.handArray.get(1).image);
+	    	System.out.println("Dealer hand size after double down " +dealerHand.handArray.size());
+	    	stand(iterator,userHand,dealerHand,userHandSplit1,userHandSplit2,imageView4,primaryStage);
 	    	btnDouble.setDisable(true);
 	    	}
 	    	
 	    });
 	    
-			
+	    btnSplit.setOnAction(e -> {
+	    	btnHitSplit1.setDisable(false);
+	    	btnStandSplit1.setDisable(false);
+			btStand.setDisable(true);
+	    	splitBoolean=true;
+	    	imageView.setY(240);
+	    	imageView2.setX(200);
+	    	imageView2.setY(340);
+	    	split1Hit(userHandSplit1,iterator,userHand,dealerHand,primaryStage);
+	    	split2Hit(userHandSplit2,userHandSplit1,iterator,userHand,dealerHand,primaryStage,imageView4);
+	    	btnSplit.setDisable(true);
+	    	btHit.setDisable(true);
+	    	btnDouble.setDisable(true);
+	    	btnDoubleSplit1.setVisible(true);
+	    	btnDoubleSplit1.setDisable(false);
+	    	bank -=Integer.parseInt(bet); 
+	    	bankLabel2.setText("Bank: $"+bank);
+	    	split1Bet = Integer.parseInt(bet); 
+	    	split2Bet = Integer.parseInt(bet); 
+	    	System.out.println("Split 1 bet " + split1Bet);
+	    	System.out.println("Split 2 bet " + split2Bet);
+	    	currentBetLabel.setText("Initial bet: $" + bet );
+	    	split2BetLabel.setText("Split 2 bet: $"+split2Bet);
+	    	split1BetLabel.setText("Split 1 bet: $"+split1Bet);
+	    	
+	    });
+	    //button to double down on split 1
+	    btnDoubleSplit1.setOnAction(e ->{
+	    	btnStandSplit1.setDisable(true);
+	    	btnDoubleSplit1.setDisable(true);
+	    	btnHitSplit1.setDisable(true);
+	    	btnHitSplit2.setDisable(false);
+	    	btnStandSplit2.setDisable(false);
+	    	btnDoubleSplit2.setDisable(false);
+	    	split1Hit(userHandSplit1,iterator,userHand,dealerHand,primaryStage);
+	    	bank -= split1Bet;
+	    	split1Bet = split1Bet *2;
+	    	bankLabel2.setText("Bank: $"+bank);
+	    	split1BetLabel.setText("Split 1 bet: $"+split1Bet);
+	    	
+	    });
+	    
+	    btnDoubleSplit2.setOnAction(e ->{
+	    	btnStandSplit2.setDisable(true);
+	    	btnDoubleSplit2.setDisable(true);
+	    	btnHitSplit2.setDisable(true);
+	    	btnHitSplit2.setDisable(true);
+	    	btnStandSplit2.setDisable(true);
+	    	btnDoubleSplit2.setDisable(true);
+	    	split2Hit(userHandSplit2,userHandSplit1,iterator,userHand,dealerHand,primaryStage, imageView4);
+	    	bank -= split2Bet;
+	    	split2Bet = split2Bet *2;
+	    	bankLabel2.setText("Bank: $"+bank);
+	    	split2BetLabel.setText("Split 1 bet: $"+split2Bet);
+	    	
+	    });
+	    
+		//hit split one	
+	    btnHitSplit1.setOnAction(e ->{
+	    	btnDoubleSplit1.setDisable(true);
+	    	split1Hit(userHandSplit1,iterator,userHand,dealerHand,primaryStage);
+	    });
+	    
+	    btnHitSplit2.setOnAction(e ->{
+	    	split2Hit(userHandSplit2,userHandSplit1,iterator,userHand,dealerHand,primaryStage, imageView4);
+	    });
+	    
+	    btnStandSplit1.setOnAction(e -> {
+	    	btnStandSplit1.setDisable(true);
+	    	btnHitSplit1.setDisable(true);
+	    	btnStandSplit2.setDisable(false);
+	    	btnHitSplit2.setDisable(false);
+	    	btnDoubleSplit1.setDisable(true);
+	    	btnDoubleSplit2.setDisable(false);
+	    	
+	    	
+	    });
+	    
+	    btnStandSplit2.setOnAction(e -> {
+	    	btnStandSplit1.setDisable(true);
+	    	btnHitSplit1.setDisable(true);
+	    	btnStandSplit2.setDisable(true);
+	    	btnHitSplit2.setDisable(true);
+	    	btnDoubleSplit2.setDisable(true);
+	    	stand(iterator,userHand,dealerHand,userHandSplit1,userHandSplit2,imageView4,primaryStage);
+	    	
+	    });
+	    
+	    
+	    
 	    
 	    //Resets game
 	    btRetry.setOnAction(e -> {
@@ -726,8 +908,18 @@ public class Game extends Application{
 				userCardHit4Label.setGraphic(null);
 				dealerCardHit1Label.setGraphic(null);
 				dealerCardHit2Label.setGraphic(null);
-				dealerCardHit3Label.setGraphic(null);
+				dealerCardHit3Label.setGraphic(null); 
 				dealerCardHit4Label.setGraphic(null);
+				userSplit1CardHit1Label.setGraphic(null);
+				userSplit1CardHit2Label.setGraphic(null);
+				userSplit1CardHit3Label.setGraphic(null);
+				userSplit1CardHit4Label.setGraphic(null);
+				userSplit2CardHit1Label.setGraphic(null);
+				userSplit2CardHit2Label.setGraphic(null);
+				userSplit2CardHit3Label.setGraphic(null);
+				userSplit2CardHit4Label.setGraphic(null);
+				split2BetLabel.setText("");
+		    	split1BetLabel.setText("");
 				resultsLabel.setText("");
 				btHit.setDisable(false);
 				btStand.setDisable(false);
@@ -737,8 +929,17 @@ public class Game extends Application{
 				userHand.handArray.removeAll(userHand.handArray);
 				dealerHand.points=0;
 				dealerHand.handArray.removeAll(userHand.handArray);
+				userHandSplit1.points=0;
+				userHandSplit1.handArray.removeAll(userHand.handArray);
+				userHandSplit2.points=0;
+				userHandSplit2.handArray.removeAll(userHand.handArray);
 				dealerCount =2;
 				count =2;
+				split1Count=1;
+				split2Count =1;
+				split1Bust = false;
+				split2Bust = false;
+				splitBoolean = false;
 				mainGame(primaryStage);
 				
 			} catch (Exception e1) {
@@ -749,24 +950,24 @@ public class Game extends Application{
 	
 		}
 
-		//adds user's bet bank to bank
+
+
+	
+	//adds user's bet bank to bank
 	public void tie() {
 			int betInt = Integer.parseInt(bet);
 			bank= bank+betInt;
-			System.out.println(bank);
 		}
 	//Adds user win to bank
 	public void userWin() {
 		int betInt = Integer.parseInt(bet);
 		bank = bank + (betInt*2);
-		System.out.println(bank);
 			
 		}
 	//checks to see if the user runs out of money
 	public void userLose(Hand userHand, Hand dealerHand, Stage primaryStage) {
-		System.out.println("Lost");
+		System.out.println("Bank value "+bank);
 		if (bank<1) {
-			System.out.print("Bank is 0");
 			//btRetry.setVisible(false);
 			btHit.setVisible(false);
 			btStand.setVisible(false);
@@ -778,17 +979,13 @@ public class Game extends Application{
 			btRetry.setText("New Game?");
 				count = 0;
 				
-				
-			
-			
 		}
-		System.out.println(bank);
 	}
 
 
 
 	//deals cards
-	private void initialDealMethod(ImageView imageView, ImageView imageView2, ImageView imageView3, ImageView imageView4) {
+	private void initialDealMethod(ImageView imageView, ImageView imageView2, ImageView imageView3, ImageView imageView4, Hand userHand) {
 		shuffleSound();
 		Timer timer = new Timer();
 		   timer.schedule(new TimerTask() {
@@ -822,6 +1019,26 @@ public class Game extends Application{
 									btStand.setVisible(true);
 									btHit.setVisible(true);
 									btnDouble.setVisible(true);
+									btnSplit.setVisible(true);
+									btnSplit.setDisable(true);
+									btnHitSplit1.setVisible(true);
+									btnHitSplit2.setVisible(true);
+									btnHitSplit1.setDisable(true);
+									btnHitSplit2.setDisable(true);
+									btnStandSplit1.setVisible(true);
+									btnStandSplit1.setDisable(true);
+									btnStandSplit2.setVisible(true);
+									btnStandSplit2.setDisable(true);
+									btnDoubleSplit1.setVisible(true);
+									btnDoubleSplit1.setDisable(true);
+									btnDoubleSplit2.setVisible(true);
+									btnDoubleSplit2.setDisable(true);
+									
+									if (userHand.handArray.get(0).type==userHand.handArray.get(1).type &&
+								    		userHand.handArray.get(0).value==userHand.handArray.get(1).value) {
+										btnSplit.setDisable(false);
+									}
+									
 									
 								}
 					   
@@ -875,20 +1092,20 @@ public class Game extends Application{
 
 
 	private void stand(ListIterator<Card> iterator, Hand userHand, Hand dealerHand,
-			ImageView imageView4, Stage primaryStage) {
+			Hand userHandSplit1, Hand userHandSplit2, ImageView imageView4, Stage primaryStage) {
+		imageView4.setImage(dealerHand.handArray.get(1).image);
 		
+		btnDoubleSplit2.setDisable(true);
 		
 		//In case the user's first move was to stand, is user's hand is calculated again
 		userHand.points= 0;
 		boolean ace = false;
 		for(int i = 0; i < userHand.handArray.size(); i++) {
-			//System.out.println(userHand.handArray.get(0).type +userHand.handArray.get(1).type );
 			
 			
 			
 			if(userHand.handArray.get(i).type=="Ace") {
 				ace = true;
-				System.out.println("You have an ace");	
 			}
 		
 			userHand.points += userHand.handArray.get(i).value;;
@@ -900,16 +1117,13 @@ public class Game extends Application{
 				for( i = 0; i < userHand.handArray.size(); i++) {
 					if(userHand.handArray.get(i).type=="Ace") {
 						userHand.handArray.get(i).value=userHand.handArray.get(i).otherValue;
-						System.out.println("Ace new value "+userHand.handArray.get(i).value);
 						
 						
 					}userHand.points += userHand.handArray.get(i).value;
-					System.out.println("New hand points value "+userHand.points);
 				}
 			
 			}
 			
-			System.out.println(userHand.points);
 		
 			if (userHand.points>21) {
 				imageView4.setImage(dealerHand.handArray.get(1).image);
@@ -929,18 +1143,16 @@ public class Game extends Application{
 		//calls the hit sound sound effect
 		hitSound();
 		//btHit.setDisable(true);
-		System.out.println("You stand");
-		System.out.println("User points after stand " +userHand.points);
-		imageView4.setImage(dealerHand.handArray.get(1).image);
+		System.out.println("Dealer hand array size after play :"+ dealerHand.handArray.size());
+		//imageView4.setImage(dealerHand.handArray.get(1).image);
 			
 		dealerHand.points = 0;
 		for(int i = 0; i < dealerHand.handArray.size(); i++) {
 			//Tells the dealer what to do and it's resulting consequences ie hitting
 			dealerHand.points+=dealerHand.handArray.get(i).value;
-			System.out.println("Dealer pounts before hit"+dealerHand.points);
 			} 
 			//Determines if the dealer needs a hit or not	
-		imageView4.setImage(dealerHand.handArray.get(1).image);
+		
 		while (dealerHand.points<17) {
 				
 			
@@ -948,23 +1160,213 @@ public class Game extends Application{
 			
 				
 			}
-		imageView4.setImage(dealerHand.handArray.get(1).image);
+		//imageView4.setImage(dealerHand.handArray.get(1).image);
+		
+		if (splitBoolean == true ) {
+			if (split1Bust==false && split2Bust == false) {
+				if(userHandSplit1.points>dealerHand.points && userHandSplit2.points>dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 and 2 win!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					split1Win();
+					split2Win();
+					
+				}else if(userHandSplit1.points<dealerHand.points && userHandSplit2.points>dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 loses!" + '\n'+
+											"Split 2 wins!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);	
+					btnDoubleSplit2.setDisable(true);
+					split2Win();
+					userLose(userHand,dealerHand,primaryStage);
+				}else if(userHandSplit1.points>dealerHand.points && userHandSplit2.points<dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 wins!" + '\n'+
+							"Split 2 loses!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);	
+					btnDoubleSplit2.setDisable(true);
+					split1Win();
+					userLose(userHand,dealerHand,primaryStage);
+				}else if(userHandSplit1.points<dealerHand.points && userHandSplit2.points<dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 and 2 lose!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);	
+					btnDoubleSplit2.setDisable(true);
+					userLose(userHand,dealerHand,primaryStage);
+				}else if (dealerHand.points>21) {
+					resultsLabel.setText("Dealer Bust");
+					btHit.setDisable(true);
+					btStand.setDisable(true);
+					btRetry.setVisible(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					//Adds the user win to bank
+					split1Win();
+					split2Win();
+				}else if(userHandSplit1.points>dealerHand.points && userHandSplit2.points==dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 wins!" + '\n'+
+							"Split 2 ties!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);	
+					btnDoubleSplit2.setDisable(true);
+					split1Win();
+					split2Tie();
+				}else if(userHandSplit1.points==dealerHand.points && userHandSplit2.points>dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 ties!" + '\n'+
+							"Split 2 wins!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);	
+					btnDoubleSplit2.setDisable(true);
+					split1Tie();
+					split2Win();
+				}else if(userHandSplit1.points==dealerHand.points && userHandSplit2.points<dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 ties!" + '\n'+
+							"Split 2 loses!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);	
+					btnDoubleSplit2.setDisable(true);
+					split1Tie();
+					userLose(userHand,dealerHand,primaryStage);
+				}else if(userHandSplit1.points<dealerHand.points && userHandSplit2.points==dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 loses!" + '\n'+
+							"Split 2 ties!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);	
+					btnDoubleSplit2.setDisable(true);
+					split2Tie();
+					userLose(userHand,dealerHand,primaryStage);
+				}else if(userHandSplit1.points==dealerHand.points && userHandSplit2.points==dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 ties!" + '\n'+
+							"Split 2 ties!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);	
+					btnDoubleSplit2.setDisable(true);
+					split2Tie();
+					split1Tie();
+				}
+				
+			}else if (split1Bust == false && split2Bust == true) {
+				if(userHandSplit1.points<dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Dealer wins");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					userLose(userHand,dealerHand,primaryStage); 
+				}else if(userHandSplit1.points>dealerHand.points) {
+					resultsLabel.setText("Split 1 wins!" + '\n'+
+							"Split 2 bust!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					split1Win();
+					
+				}else if(dealerHand.points==userHandSplit1.points) {
+					resultsLabel.setText("Split 1 ties!" + '\n'+
+							"Split 2 bust!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					//adds user's bet back to hand
+					split1Tie();
+					
+				}else if (dealerHand.points>21) {
+					resultsLabel.setText("Split 1 wins!" + '\n'+
+							"Dealer Bust");
+					btHit.setDisable(true);
+					btStand.setDisable(true);
+					btRetry.setVisible(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					//Adds the user win to bank
+					split1Win();
+				
+				}
+			}else if (split2Bust == false && split1Bust == true) {
+				if(userHandSplit2.points<dealerHand.points && dealerHand.points<22) {
+					resultsLabel.setText("Split 1 bust!" + '\n'+
+							"Split 2 loses!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					userLose(userHand,dealerHand,primaryStage); 
+				}else if(userHandSplit2.points>dealerHand.points) {
+					resultsLabel.setText("Split 2 wins!" + '\n'+
+							"Split 1 bust!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					split2Win();
+					
+				}else if(dealerHand.points==userHandSplit2.points) {
+					resultsLabel.setText("Split 2 ties!" + '\n'+
+							"Split 1 bust!");
+					btHit.setDisable(true);
+					btRetry.setVisible(true);
+					btStand.setDisable(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					//adds user's bet back to hand
+					split2Tie();
+					
+				}else if (dealerHand.points>21) {
+					resultsLabel.setText("Split 2 wins!" + '\n'+
+							"Dealer Bust");
+					btHit.setDisable(true);
+					btStand.setDisable(true);
+					btRetry.setVisible(true);
+					btnDouble.setDisable(true);
+					btnDoubleSplit2.setDisable(true);
+					//Adds the user win to bank
+					split2Win();
+				
+				}
+				
+			}
 		//This line of codes determines if the dealer wins with just their two initial cards
-		if(userHand.points<dealerHand.points && dealerHand.points<22) {
-			System.out.println("Dealer wins with two cards " +dealerHand.points);
+		}else if(userHand.points<dealerHand.points && dealerHand.points<22) {
 			resultsLabel.setText("Dealer wins");
 			btHit.setDisable(true);
 			btRetry.setVisible(true);
 			btStand.setDisable(true);
 			btnDouble.setDisable(true);
+			btnDoubleSplit2.setDisable(true);
 		}else if(userHand.points>dealerHand.points) {
-				System.out.println("Dealer loses with two cards " +dealerHand.points);
-				resultsLabel.setText("Player wins");
-				btHit.setDisable(true);
-				btRetry.setVisible(true);
-				btStand.setDisable(true);
-				btnDouble.setDisable(true);
-				userWin();
+			resultsLabel.setText("Player wins");
+			btHit.setDisable(true);
+			btRetry.setVisible(true);
+			btStand.setDisable(true);
+			btnDouble.setDisable(true);
+			btnDoubleSplit2.setDisable(true);
+			userWin();
 			
 		}else if(dealerHand.points==userHand.points) {
 			imageView4.setImage(dealerHand.handArray.get(1).image);
@@ -972,8 +1374,8 @@ public class Game extends Application{
 			btHit.setDisable(true);
 			btRetry.setVisible(true);
 			btStand.setDisable(true);
-			System.out.println("Error here?");
 			btnDouble.setDisable(true);
+			btnDoubleSplit2.setDisable(true);
 			//adds user's bet back to hand
 			tie();
 			
@@ -984,6 +1386,7 @@ public class Game extends Application{
 			btStand.setDisable(true);
 			btRetry.setVisible(true);
 			btnDouble.setDisable(true);
+			btnDoubleSplit2.setDisable(true);
 			//Adds the user win to bank
 			userWin();
 			
@@ -997,25 +1400,49 @@ public class Game extends Application{
 
 				
 
+private void split1Tie() {
+	bank = bank + split1Bet;		
+	}
+
+
+
+private void split2Tie() {
+	bank = bank + split2Bet;	
+	}
+
+
+
+private void split2Win() {
+	bank = bank + (split2Bet*2);
+		
+	}
+
+
+
+private void split1Win() {
+	bank = bank + (split1Bet*2);
+		
+	}
+
+
+
+
 int dealerCount=2;
 	//Determines the consequences of a dealer hit
 	private int dealerHit(Hand dealerHand, ListIterator<Card> iterator, Hand userHand, ImageView imageView4) {
-		imageView4.setImage(dealerHand.handArray.get(1).image);
+		//imageView4.setImage(dealerHand.handArray.get(1).image);
 	
-		System.out.println("Method works");
-		System.out.println("User hand after dealer hit" + userHand.points);
 		//adds card to userhand
 		dealerHand.handArray.add(iterator.next());
 		hitSound();
 	
-		imageView4.setImage(dealerHand.handArray.get(1).image);					
+		//imageView4.setImage(dealerHand.handArray.get(1).image);					
 	//adds dealer hit cards
 	if (dealerCount==2) {
 		 
 		   	
 		ImageView dealerCardHit1 =new ImageView(dealerHand.handArray.get(dealerCount).image);
 		  
-		System.out.println("Should add card "+ (dealerCount-1));
 		
 		dealerCardHit1Label.setGraphic(dealerCardHit1);
 		dealerCardHit1Label.setLayoutX(105);
@@ -1077,7 +1504,6 @@ int dealerCount=2;
 				//Checks dealer hand for an ace 
 				if(dealerHand.handArray.get(i).type=="Ace") {
 					ace = true;
-					System.out.println("You have an ace");	
 				}
 			
 				dealerHand.points += dealerHand.handArray.get(i).value;
@@ -1089,16 +1515,13 @@ int dealerCount=2;
 					for( i = 0; i < dealerHand.handArray.size(); i++) {
 						if(dealerHand.handArray.get(i).type=="Ace") {
 							dealerHand.handArray.get(i).value=dealerHand.handArray.get(i).otherValue;
-							System.out.println("Dealer Ace new value "+dealerHand.handArray.get(i).value);
 							
 							
-						}dealerHand.points += dealerHand.handArray.get(i).value;
-						System.out.println("New dealer hand points value "+dealerHand.points);
+						}
+						dealerHand.points += dealerHand.handArray.get(i).value;
 					}
 				
 				}
-				
-				System.out.println(dealerHand.points);
 			
 			 
 			}
@@ -1107,7 +1530,190 @@ int dealerCount=2;
 			
 				
 				}
+	int split2Count =1;
+	private void split2Hit(Hand userHandSplit2, Hand userHandSplit1, ListIterator<Card> iterator, Hand userHand, Hand dealerHand,
+			Stage primaryStage, ImageView imageView4) {
+		hitSound();
+		userHandSplit2.handArray.add(iterator.next());
+		
+		if (split2Count==1) {
+			ImageView userSplit2CardHit1 =new ImageView(userHandSplit2.handArray.get(split2Count).image);
+		
+			userSplit2CardHit1Label.setGraphic(userSplit2CardHit1);
+			userSplit2CardHit1Label.setTranslateX(85);
+			userSplit2CardHit1Label.setTranslateY(127);
+			userSplit2CardHit1Label.setScaleX(.2);
+			userSplit2CardHit1Label.setScaleY(.19);
+			split2Count++;
+		}else if (split2Count==2) {
+			ImageView userSplit2CardHit1 =new ImageView(userHandSplit2.handArray.get(split2Count).image);
+		
+			userSplit2CardHit2Label.setGraphic(userSplit2CardHit1);
+			userSplit2CardHit2Label.setTranslateX(108);
+			userSplit2CardHit2Label.setTranslateY(127);
+			userSplit2CardHit2Label.setScaleX(.2);
+			userSplit2CardHit2Label.setScaleY(.19);
+			split2Count++;
+		}else if (split2Count==3) {
+			ImageView userSplit2CardHit1 =new ImageView(userHandSplit2.handArray.get(split2Count).image);
+		
+			userSplit2CardHit3Label.setGraphic(userSplit2CardHit1);
+			userSplit2CardHit3Label.setTranslateX(131);
+			userSplit2CardHit3Label.setTranslateY(127);
+			userSplit2CardHit3Label.setScaleX(.2);
+			userSplit2CardHit3Label.setScaleY(.19);
+			split2Count++;
+		}else if (split2Count==4) {
+			ImageView userSplit2CardHit1 =new ImageView(userHandSplit2.handArray.get(split2Count).image);
+		
+			userSplit2CardHit4Label.setGraphic(userSplit2CardHit1);
+			userSplit2CardHit4Label.setTranslateX(154);
+			userSplit2CardHit4Label.setTranslateY(127);
+			userSplit2CardHit4Label.setScaleX(.2);
+			userSplit2CardHit4Label.setScaleY(.19);
+			split1Count++;
 			
+		}
+		userHandSplit2.points= 0;
+			boolean ace = false;
+			for(int i = 0; i < userHandSplit2.handArray.size(); i++) {
+				
+				
+				
+				if(userHandSplit2.handArray.get(i).type=="Ace") {	
+				}
+			
+				userHandSplit2.points += userHandSplit2.handArray.get(i).value;;
+				
+				//if the hand breaks 21 and has an ace, the ace value is reassigned to one and the 
+				//hand points value is recalculated
+				if (userHandSplit2.points>21 && ace==true) {
+					userHandSplit2.points = 0;
+					for( i = 0; i < userHandSplit2.handArray.size(); i++) {
+						if(userHandSplit2.handArray.get(i).type=="Ace") {
+							userHandSplit2.handArray.get(i).value=userHandSplit2.handArray.get(i).otherValue;
+							
+							
+						}userHandSplit2.points += userHandSplit2.handArray.get(i).value;
+					}
+				
+				}
+			
+				if (userHandSplit2.points>21) {
+					resultsLabel.setText("Split 2 Bust");
+					split2Bust = true; 
+					btnHitSplit1.setDisable(true);
+					btnStandSplit1.setDisable(true);
+					btnHitSplit2.setDisable(true);
+					btnStandSplit2.setDisable(true);
+					userLose(userHand,dealerHand,primaryStage);
+					if(split1Bust == true) {
+						resultsLabel.setText("Split 1 and 2 bust!");
+						btHit.setDisable(true);
+						btRetry.setVisible(true);
+						btStand.setDisable(true);
+						btnDouble.setDisable(true);
+						btnDoubleSplit2.setDisable(true);
+					}else {
+						stand(iterator,userHand,dealerHand,userHandSplit1,userHandSplit2,imageView4,primaryStage);
+					}
+		
+				}
+			
+			}
+			//return userHandSplit1.points;					
+				
+		}
+	
+		
+	
+	//hits the split 1 hand
+	int split1Count = 1;
+	private void split1Hit(Hand userHandSplit1, ListIterator<Card> iterator, Hand userHand, Hand dealerHand, Stage primaryStage) {
+		hitSound();
+		userHandSplit1.handArray.add(iterator.next());
+		
+		if (split1Count==1) {
+			ImageView userSplit1CardHit1 =new ImageView(userHandSplit1.handArray.get(split1Count).image);
+			userSplit1CardHit1Label.setGraphic(userSplit1CardHit1);
+			userSplit1CardHit1Label.setTranslateX(85);
+			userSplit1CardHit1Label.setTranslateY(26);
+			userSplit1CardHit1Label.setScaleX(.2);
+			userSplit1CardHit1Label.setScaleY(.19);
+			split1Count++;
+		}else if (split1Count==2) {
+			ImageView userSplit1CardHit2 =new ImageView(userHandSplit1.handArray.get(split1Count).image);
+		
+			userSplit1CardHit2Label.setGraphic(userSplit1CardHit2);
+			userSplit1CardHit2Label.setTranslateX(108);
+			userSplit1CardHit2Label.setTranslateY(26);
+			userSplit1CardHit2Label.setScaleX(.2);
+			userSplit1CardHit2Label.setScaleY(.19);
+			split1Count++;
+		}else if (split1Count==3) {
+			ImageView userSplit1CardHit3 =new ImageView(userHandSplit1.handArray.get(split1Count).image);
+		
+			userSplit1CardHit3Label.setGraphic(userSplit1CardHit3);
+			userSplit1CardHit3Label.setTranslateX(131);
+			userSplit1CardHit3Label.setTranslateY(26);
+			userSplit1CardHit3Label.setScaleX(.2);
+			userSplit1CardHit3Label.setScaleY(.19);
+			split1Count++;
+		}else if (split1Count==4) {
+			ImageView userSplit1CardHit4 =new ImageView(userHandSplit1.handArray.get(split1Count).image);
+		
+			userSplit1CardHit4Label.setGraphic(userSplit1CardHit4);
+			userSplit1CardHit4Label.setTranslateX(154);
+			userSplit1CardHit4Label.setTranslateY(26);
+			userSplit1CardHit4Label.setScaleX(.2);
+			userSplit1CardHit4Label.setScaleY(.19);
+			split1Count++;
+			
+		}
+			userHandSplit1.points= 0;
+			boolean ace = false;
+			for(int i = 0; i < userHandSplit1.handArray.size(); i++) {
+				
+				
+				
+				if(userHandSplit1.handArray.get(i).type=="Ace") {
+					ace = true;
+				}
+			
+				userHandSplit1.points += userHandSplit1.handArray.get(i).value;;
+				
+				//if the hand breaks 21 and has an ace, the ace value is reassigned to one and the 
+				//hand points value is recalculated
+				if (userHandSplit1.points>21 && ace==true) {
+					userHandSplit1.points = 0;
+					for( i = 0; i < userHandSplit1.handArray.size(); i++) {
+						if(userHandSplit1.handArray.get(i).type=="Ace") {
+							userHandSplit1.handArray.get(i).value=userHandSplit1.handArray.get(i).otherValue;
+							
+							
+						}userHandSplit1.points += userHandSplit1.handArray.get(i).value;
+					}
+				
+				}
+			
+				if (userHandSplit1.points>21) {
+					resultsLabel.setText("Split 1 Bust");
+					split1Bust = true;
+					btnHitSplit1.setDisable(true);
+					btnStandSplit1.setDisable(true);
+					btnHitSplit2.setDisable(false);
+					btnStandSplit2.setDisable(false);
+					btnDoubleSplit1.setDisable(true);
+					btnDoubleSplit2.setDisable(false);
+					userLose(userHand,dealerHand,primaryStage);
+		
+				}
+			
+			}
+			//return userHandSplit1.points;					
+				
+		}
+		
 	
 
 	//counter adds cards to userHand
@@ -1165,13 +1771,11 @@ int dealerCount=2;
 		userHand.points= 0;
 		boolean ace = false;
 		for(int i = 0; i < userHand.handArray.size(); i++) {
-			//System.out.println(userHand.handArray.get(0).type +userHand.handArray.get(1).type );
 			
 			
 			
 			if(userHand.handArray.get(i).type=="Ace") {
 				ace = true;
-				System.out.println("You have an ace");	
 			}
 		
 			userHand.points += userHand.handArray.get(i).value;;
@@ -1183,16 +1787,12 @@ int dealerCount=2;
 				for( i = 0; i < userHand.handArray.size(); i++) {
 					if(userHand.handArray.get(i).type=="Ace") {
 						userHand.handArray.get(i).value=userHand.handArray.get(i).otherValue;
-						System.out.println("Ace new value "+userHand.handArray.get(i).value);
 						
 						
 					}userHand.points += userHand.handArray.get(i).value;
-					System.out.println("New hand points value "+userHand.points);
 				}
 			
 			}
-			
-			System.out.println(userHand.points);
 		
 			if (userHand.points>21) {
 				imageView4.setImage(dealerHand.handArray.get(1).image);
@@ -1204,6 +1804,7 @@ int dealerCount=2;
 				btHit.setDisable(true);
 				btRetry.setVisible(true);
 				btnDouble.setDisable(true);
+				btnDoubleSplit2.setDisable(false);
 				userLose(dealerHand, dealerHand, null);
 	
 			}
@@ -1263,7 +1864,7 @@ try {
 	e.printStackTrace();
 }
 
-//song.loop(Clip.LOOP_CONTINUOUSLY);
+song.loop(Clip.LOOP_CONTINUOUSLY);
 Application.launch(args);
 	
 	}
